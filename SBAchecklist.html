@@ -1,0 +1,756 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Assignment Checklist — DOM Manipulation</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #f5f4f0;
+    --surface: #ffffff;
+    --surface2: #f0efe9;
+    --border: #e2e0d8;
+    --border2: #cccab8;
+    --text: #1a1917;
+    --text2: #6b6860;
+    --text3: #9b9890;
+    --green: #1D9E75;
+    --green-bg: #e8f7f2;
+    --green-text: #0f6e56;
+    --purple: #7F77DD;
+    --purple-bg: #EEEDFE;
+    --purple-text: #3C3489;
+    --blue: #378ADD;
+    --blue-bg: #E6F1FB;
+    --blue-text: #185FA5;
+    --teal: #1D9E75;
+    --teal-bg: #E1F5EE;
+    --teal-text: #0F6E56;
+    --amber: #BA7517;
+    --amber-bg: #FAEEDA;
+    --amber-text: #633806;
+    --coral: #D85A30;
+    --coral-bg: #FAECE7;
+    --coral-text: #4A1B0C;
+    --pink: #D4537E;
+    --pink-bg: #FBEAF0;
+    --pink-text: #4B1528;
+    --gray: #5F5E5A;
+    --gray-bg: #F1EFE8;
+    --gray-text: #2C2C2A;
+    --radius: 10px;
+    --radius-sm: 6px;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #1a1917;
+      --surface: #242320;
+      --surface2: #2c2b28;
+      --border: #3a3935;
+      --border2: #4a4945;
+      --text: #f0efe9;
+      --text2: #9b9890;
+      --text3: #6b6860;
+      --green-bg: #0a2e22;
+      --green-text: #5DCAA5;
+      --purple-bg: #1e1c3a;
+      --purple-text: #AFA9EC;
+      --blue-bg: #0c1e33;
+      --blue-text: #85B7EB;
+      --teal-bg: #0a2e22;
+      --teal-text: #5DCAA5;
+      --amber-bg: #2a1e08;
+      --amber-text: #FAC775;
+      --coral-bg: #2a1208;
+      --coral-text: #F0997B;
+      --pink-bg: #2a0e1a;
+      --pink-text: #ED93B1;
+      --gray-bg: #242320;
+      --gray-text: #D3D1C7;
+    }
+  }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    padding: 0;
+  }
+
+  header {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 1.25rem 1.5rem;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+  }
+
+  .header-inner {
+    max-width: 720px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+
+  .header-title {
+    font-size: 16px;
+    font-weight: 600;
+    flex: 1;
+    min-width: 160px;
+  }
+
+  .header-title span {
+    display: block;
+    font-size: 12px;
+    font-weight: 400;
+    color: var(--text2);
+    margin-top: 1px;
+  }
+
+  .progress-wrap {
+    flex: 2;
+    min-width: 180px;
+  }
+
+  .progress-bar-bg {
+    height: 8px;
+    background: var(--surface2);
+    border-radius: 99px;
+    overflow: hidden;
+    margin-bottom: 4px;
+  }
+
+  .progress-bar-fill {
+    height: 100%;
+    background: var(--green);
+    border-radius: 99px;
+    transition: width 0.4s cubic-bezier(.4,0,.2,1);
+    width: 0%;
+  }
+
+  .progress-label {
+    font-size: 12px;
+    color: var(--text2);
+    text-align: right;
+  }
+
+  .reset-btn {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 12px;
+    color: var(--text2);
+    background: none;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 5px 10px;
+    cursor: pointer;
+    transition: background 0.15s, color 0.15s;
+    white-space: nowrap;
+  }
+  .reset-btn:hover { background: var(--surface2); color: var(--text); }
+
+  main {
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 1.5rem 1rem 4rem;
+  }
+
+  .section {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    margin-bottom: 0.75rem;
+    overflow: hidden;
+  }
+
+  .section-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 13px 16px;
+    cursor: pointer;
+    user-select: none;
+    transition: background 0.15s;
+  }
+  .section-header:hover { background: var(--surface2); }
+
+  .section-accent {
+    width: 3px;
+    height: 20px;
+    border-radius: 99px;
+    flex-shrink: 0;
+  }
+
+  .section-title {
+    font-size: 14px;
+    font-weight: 600;
+    flex: 1;
+  }
+
+  .section-badge {
+    font-size: 11px;
+    font-weight: 500;
+    padding: 2px 8px;
+    border-radius: 99px;
+    background: var(--surface2);
+    color: var(--text2);
+    transition: background 0.2s, color 0.2s;
+  }
+  .section-badge.all-done {
+    background: var(--green-bg);
+    color: var(--green-text);
+  }
+
+  .chevron {
+    font-size: 16px;
+    color: var(--text3);
+    transition: transform 0.2s;
+    line-height: 1;
+  }
+  .chevron.open { transform: rotate(180deg); }
+
+  .task-list {
+    border-top: 1px solid var(--border);
+  }
+
+  .task {
+    padding: 11px 16px;
+    border-bottom: 1px solid var(--border);
+    transition: background 0.15s;
+  }
+  .task:last-child { border-bottom: none; }
+  .task.done { background: var(--green-bg); }
+
+  .task-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  .checkbox {
+    width: 20px;
+    height: 20px;
+    border-radius: 5px;
+    border: 1.5px solid var(--border2);
+    background: var(--surface);
+    cursor: pointer;
+    flex-shrink: 0;
+    margin-top: 1px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.15s;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .checkbox:hover { border-color: var(--green); }
+  .checkbox.checked { background: var(--green); border-color: var(--green); }
+  .checkbox svg { display: none; }
+  .checkbox.checked svg { display: block; }
+
+  .task-content { flex: 1; min-width: 0; }
+
+  .task-label {
+    font-size: 14px;
+    line-height: 1.5;
+    color: var(--text);
+    transition: color 0.15s;
+  }
+  .task.done .task-label {
+    color: var(--text3);
+    text-decoration: line-through;
+  }
+
+  .toggle-steps {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 12px;
+    color: var(--blue);
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 3px 0 0;
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .toggle-steps:hover { text-decoration: underline; }
+
+  .steps {
+    display: none;
+    margin: 8px 0 2px 30px;
+    padding: 10px 12px;
+    background: var(--surface2);
+    border-radius: var(--radius-sm);
+    border-left: 2px solid var(--border2);
+  }
+  .steps.open { display: block; }
+
+  .step {
+    display: flex;
+    gap: 8px;
+    align-items: flex-start;
+    margin-bottom: 6px;
+  }
+  .step:last-child { margin-bottom: 0; }
+
+  .step-dot {
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: var(--text3);
+    flex-shrink: 0;
+    margin-top: 7px;
+  }
+
+  .step-text {
+    font-size: 13px;
+    color: var(--text2);
+    line-height: 1.55;
+  }
+
+  .example {
+    display: inline-block;
+    font-size: 11px;
+    font-family: 'DM Mono', monospace;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 4px 8px;
+    color: var(--purple-text);
+    margin-top: 4px;
+    word-break: break-all;
+    line-height: 1.5;
+  }
+
+  .congrats {
+    display: none;
+    text-align: center;
+    padding: 2.5rem 1rem;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    margin-bottom: 0.75rem;
+  }
+  .congrats.visible { display: block; }
+  .congrats-icon { font-size: 36px; margin-bottom: 0.5rem; }
+  .congrats h2 { font-size: 17px; font-weight: 600; margin-bottom: 0.25rem; }
+  .congrats p { font-size: 14px; color: var(--text2); }
+
+  @media (max-width: 480px) {
+    .header-inner { gap: 0.75rem; }
+    .header-title { font-size: 15px; }
+    main { padding: 1rem 0.75rem 4rem; }
+    .task { padding: 10px 12px; }
+    .section-header { padding: 12px 12px; }
+    .steps { margin-left: 20px; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-inner">
+    <div class="header-title">
+      Assignment Checklist
+      <span>DOM Manipulation — all 18 requirements</span>
+    </div>
+    <div class="progress-wrap">
+      <div class="progress-bar-bg"><div class="progress-bar-fill" id="prog-fill"></div></div>
+      <div class="progress-label" id="prog-label">0 of 18 complete</div>
+    </div>
+    <button class="reset-btn" id="reset-btn">Reset</button>
+  </div>
+</header>
+
+<main>
+  <div class="congrats" id="congrats">
+    <div class="congrats-icon">🏆</div>
+    <h2>All done — amazing work!</h2>
+    <p>Every requirement is checked off. Time to submit.</p>
+  </div>
+  <div id="checklist"></div>
+</main>
+
+<script>
+const STORAGE_KEY = 'dom-checklist-v1';
+
+const sections = [
+  {
+    title: "DOM selection & caching",
+    color: "#7F77DD",
+    tasks: [
+      {
+        id: "t1",
+        label: "Cache at least one element using getElementById",
+        steps: [
+          "Give an element an id in your HTML, e.g. <div id=\"output\">",
+          "In JS, store it: const output = document.getElementById('output')",
+          "Use that variable later instead of querying again — that's the cache"
+        ],
+        example: "const btn = document.getElementById('submit-btn')"
+      },
+      {
+        id: "t2",
+        label: "Cache at least one element using querySelector or querySelectorAll",
+        steps: [
+          "querySelector grabs the first match: const card = document.querySelector('.card')",
+          "querySelectorAll grabs all matches: const items = document.querySelectorAll('li')",
+          "Store the result in a variable so you're caching it"
+        ],
+        example: "const inputs = document.querySelectorAll('input[type=\"text\"]')"
+      },
+      {
+        id: "t3",
+        label: "Navigate between elements using parent-child-sibling relationships",
+        steps: [
+          "From a child, get its parent: element.parentNode",
+          "From a parent, get children: element.firstChild / lastChild / children[0]",
+          "Between siblings: element.nextElementSibling / previousElementSibling",
+          "Use this inside an event handler — e.g. when a button is clicked, style its sibling"
+        ],
+        example: "btn.nextElementSibling.style.display = 'block'"
+      }
+    ]
+  },
+  {
+    title: "Working with collections",
+    color: "#378ADD",
+    tasks: [
+      {
+        id: "t4",
+        label: "Iterate over a collection of elements to accomplish a task",
+        steps: [
+          "Get a NodeList or array of elements first (querySelectorAll, children, etc.)",
+          "Loop using forEach, for...of, or a regular for loop",
+          "Do something meaningful in each iteration — add a class, update text, attach a listener"
+        ],
+        example: "items.forEach(item => item.classList.add('visible'))"
+      }
+    ]
+  },
+  {
+    title: "Creating & appending elements",
+    color: "#1D9E75",
+    tasks: [
+      {
+        id: "t5",
+        label: "Create at least one element using createElement",
+        steps: [
+          "const newEl = document.createElement('div')",
+          "Set its content: newEl.textContent = 'Hello'",
+          "Don't forget to actually add it to the DOM (see next requirement)"
+        ],
+        example: "const li = document.createElement('li')"
+      },
+      {
+        id: "t6",
+        label: "Use appendChild and/or prepend to add new elements to the DOM",
+        steps: [
+          "appendChild adds to the end: parent.appendChild(newEl)",
+          "prepend adds to the beginning: parent.prepend(newEl)",
+          "This should happen dynamically — e.g. when a user submits a form or clicks a button"
+        ],
+        example: "list.appendChild(li)"
+      },
+      {
+        id: "t7",
+        label: "Use DocumentFragment or cloneNode for templated content",
+        steps: [
+          "Option A — DocumentFragment: const frag = document.createDocumentFragment(), build into it, then append once",
+          "Option B — cloneNode: put a <template> in HTML, clone it with template.content.cloneNode(true), fill in data, append",
+          "Both avoid repeatedly hitting the DOM — great for rendering lists of repeated items"
+        ],
+        example: "const clone = template.content.cloneNode(true); clone.querySelector('.name').textContent = name"
+      }
+    ]
+  },
+  {
+    title: "Modifying content & styles",
+    color: "#BA7517",
+    tasks: [
+      {
+        id: "t8",
+        label: "Modify HTML or text content of an element in response to user interaction",
+        steps: [
+          "innerHTML sets HTML string: el.innerHTML = '<strong>Done!</strong>'",
+          "textContent / innerText set plain text: el.textContent = 'Updated'",
+          "Must happen inside an event handler (click, input, submit, etc.)"
+        ],
+        example: "output.textContent = 'You typed: ' + input.value"
+      },
+      {
+        id: "t9",
+        label: "Modify style and/or CSS classes of an element in response to user interaction",
+        steps: [
+          "classList.add('active') / classList.remove('hidden') / classList.toggle('open')",
+          "Or direct style: el.style.color = 'red'",
+          "Triggers must be user-driven — click, input change, etc."
+        ],
+        example: "card.classList.toggle('expanded') when header is clicked"
+      },
+      {
+        id: "t10",
+        label: "Modify at least one attribute of an element in response to user interaction",
+        steps: [
+          "el.setAttribute('disabled', true) or el.removeAttribute('disabled')",
+          "el.setAttribute('src', newUrl) or img.alt = 'new description'",
+          "Common targets: disabled, src, href, placeholder, aria-expanded"
+        ],
+        example: "img.setAttribute('src', selectedImage) when user clicks a thumbnail"
+      }
+    ]
+  },
+  {
+    title: "Events",
+    color: "#D85A30",
+    tasks: [
+      {
+        id: "t11",
+        label: "Register at least two different event listeners with handler functions",
+        steps: [
+          "Use addEventListener: el.addEventListener('click', handleClick)",
+          "Must be two different event types — e.g. 'click' and 'input', or 'click' and 'mouseover'",
+          "Write named handler functions (not just anonymous arrows) for full credit",
+          "Examples: click, input, change, submit, keydown, mouseover, focus, blur"
+        ],
+        example: "btn.addEventListener('click', handleAdd); search.addEventListener('input', handleFilter)"
+      }
+    ]
+  },
+  {
+    title: "Browser Object Model (BOM)",
+    color: "#D4537E",
+    tasks: [
+      {
+        id: "t12",
+        label: "Use at least two BOM properties or methods",
+        steps: [
+          "window.alert() / window.confirm() / window.prompt()",
+          "window.location.href — read or set the page URL",
+          "window.localStorage.setItem() / getItem()",
+          "window.setTimeout() / window.setInterval()",
+          "window.innerWidth / window.innerHeight — viewport size",
+          "window.history.back()"
+        ],
+        example: "window.alert('Saved!') and window.localStorage.setItem('data', JSON.stringify(items))"
+      }
+    ]
+  },
+  {
+    title: "Forms & validation",
+    color: "#1D9E75",
+    tasks: [
+      {
+        id: "t13",
+        label: "Include a form/input with HTML attribute validation",
+        steps: [
+          "Add validation attributes directly in HTML on your <input>",
+          "Examples: required, minlength=\"3\", maxlength=\"100\", type=\"email\", min=\"1\", pattern=\"[A-Za-z]+\"",
+          "The browser enforces these automatically on form submit"
+        ],
+        example: "<input type=\"email\" required placeholder=\"Enter email\">"
+      },
+      {
+        id: "t14",
+        label: "Include a form/input with DOM event-based validation (in addition to HTML validation)",
+        steps: [
+          "Listen to 'input', 'blur', or 'submit' events on the form/field",
+          "Write JS to check the value and show a custom error message in the DOM",
+          "Don't rely only on browser alerts — update an error <span> or <p> in the page",
+          "Can be the same form as above, but must add JS-driven checks on top"
+        ],
+        example: "input.addEventListener('blur', () => { if(input.value.length < 3) errorMsg.textContent = 'Too short' })"
+      }
+    ]
+  },
+  {
+    title: "Code quality & submission",
+    color: "#5F5E5A",
+    tasks: [
+      {
+        id: "t15",
+        label: "Ensure the program runs without errors (comment out broken code with explanations)",
+        steps: [
+          "Open the browser console (F12) and fix or comment out anything with red errors",
+          "For commented-out code, add a note: // Blocker: couldn't get X to work because...",
+          "Partial credit is given for explained blockers — don't leave silent broken code"
+        ]
+      },
+      {
+        id: "t16",
+        label: "Commit frequently to the git repository",
+        steps: [
+          "Aim for a commit after each major feature or requirement is complete",
+          "Commit message tip: 'Add event listeners for click and input' is better than 'update'",
+          "At minimum: one commit per requirement group"
+        ],
+        example: "git add . && git commit -m 'Add form validation with event listeners'"
+      },
+      {
+        id: "t17",
+        label: "Include a README file with a description of your application",
+        steps: [
+          "Create README.md in your project root",
+          "Include: what the app does, how to run it, and any features you're proud of",
+          "Mention anything you commented out and why"
+        ]
+      },
+      {
+        id: "t18",
+        label: "Show creativity, polished presentation, and good user experience",
+        steps: [
+          "Pick an idea you find interesting — it shows in the final product",
+          "Make the UI clean and readable (good spacing, clear labels)",
+          "Add small UX touches: confirmation messages, loading states, empty states",
+          "Make sure it works on different screen sizes if possible"
+        ]
+      }
+    ]
+  }
+];
+
+const total = sections.reduce((a, s) => a + s.tasks.length, 0);
+let state = {};
+
+function loadState() {
+  try {
+    const saved = localStorage.getItem(STORAGE_KEY);
+    if (saved) state = JSON.parse(saved);
+  } catch(e) {}
+  sections.forEach(s => s.tasks.forEach(t => { if (!(t.id in state)) state[t.id] = false; }));
+}
+
+function saveState() {
+  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); } catch(e) {}
+}
+
+function countDone() { return Object.values(state).filter(Boolean).length; }
+
+function updateProgress() {
+  const done = countDone();
+  const pct = Math.round((done / total) * 100);
+  document.getElementById('prog-fill').style.width = pct + '%';
+  document.getElementById('prog-label').textContent = done + ' of ' + total + ' complete';
+  document.getElementById('congrats').classList.toggle('visible', done === total);
+}
+
+function buildChecklist() {
+  const container = document.getElementById('checklist');
+  container.innerHTML = '';
+
+  sections.forEach(sec => {
+    const secDone = sec.tasks.filter(t => state[t.id]).length;
+    const allDone = secDone === sec.tasks.length;
+
+    const secEl = document.createElement('div');
+    secEl.className = 'section';
+
+    const header = document.createElement('div');
+    header.className = 'section-header';
+    header.setAttribute('role', 'button');
+    header.setAttribute('tabindex', '0');
+    header.setAttribute('aria-expanded', 'true');
+    header.innerHTML = `
+      <div class="section-accent" style="background:${sec.color}"></div>
+      <span class="section-title">${sec.title}</span>
+      <span class="section-badge${allDone ? ' all-done' : ''}">${secDone}/${sec.tasks.length}</span>
+      <span class="chevron open">▾</span>
+    `;
+
+    const taskList = document.createElement('div');
+    taskList.className = 'task-list';
+
+    sec.tasks.forEach(task => {
+      const taskEl = document.createElement('div');
+      taskEl.className = 'task' + (state[task.id] ? ' done' : '');
+      taskEl.dataset.id = task.id;
+
+      const hasSteps = task.steps && task.steps.length;
+      let stepsHtml = '';
+      if (hasSteps) {
+        stepsHtml = `<div class="steps" id="steps-${task.id}">`;
+        task.steps.forEach(s => {
+          stepsHtml += `<div class="step"><div class="step-dot"></div><span class="step-text">${s}</span></div>`;
+        });
+        if (task.example) {
+          stepsHtml += `<div class="step"><div class="step-dot"></div><span class="step-text">Example:<br><code class="example">${task.example}</code></span></div>`;
+        }
+        stepsHtml += '</div>';
+      }
+
+      taskEl.innerHTML = `
+        <div class="task-row">
+          <div class="checkbox${state[task.id] ? ' checked' : ''}" role="checkbox" aria-checked="${state[task.id]}" tabindex="0" data-id="${task.id}">
+            <svg width="12" height="9" viewBox="0 0 12 9" fill="none"><path d="M1 4L4.5 7.5L11 1" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </div>
+          <div class="task-content">
+            <div class="task-label">${task.label}</div>
+            ${hasSteps ? `<button class="toggle-steps" data-target="steps-${task.id}">▸ steps & examples</button>` : ''}
+          </div>
+        </div>
+        ${stepsHtml}
+      `;
+
+      taskList.appendChild(taskEl);
+    });
+
+    secEl.appendChild(header);
+    secEl.appendChild(taskList);
+    container.appendChild(secEl);
+
+    const toggleSection = () => {
+      const chevron = header.querySelector('.chevron');
+      const isOpen = chevron.classList.contains('open');
+      taskList.style.display = isOpen ? 'none' : '';
+      chevron.classList.toggle('open', !isOpen);
+      header.setAttribute('aria-expanded', String(!isOpen));
+    };
+    header.addEventListener('click', toggleSection);
+    header.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggleSection(); }});
+  });
+
+  container.querySelectorAll('.checkbox').forEach(box => {
+    const toggle = () => {
+      const id = box.dataset.id;
+      state[id] = !state[id];
+      saveState();
+      buildChecklist();
+      updateProgress();
+    };
+    box.addEventListener('click', toggle);
+    box.addEventListener('keydown', e => { if (e.key === ' ' || e.key === 'Enter') { e.preventDefault(); toggle(); }});
+  });
+
+  container.querySelectorAll('.toggle-steps').forEach(btn => {
+    btn.addEventListener('click', e => {
+      e.stopPropagation();
+      const target = document.getElementById(btn.dataset.target);
+      const isOpen = target.classList.toggle('open');
+      btn.textContent = (isOpen ? '▾ hide steps' : '▸ steps & examples');
+    });
+  });
+}
+
+document.getElementById('reset-btn').addEventListener('click', () => {
+  if (confirm('Reset all checkboxes? Your progress will be cleared.')) {
+    sections.forEach(s => s.tasks.forEach(t => { state[t.id] = false; }));
+    saveState();
+    buildChecklist();
+    updateProgress();
+  }
+});
+
+loadState();
+buildChecklist();
+updateProgress();
+</script>
+</body>
+</html>
