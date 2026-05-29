@@ -5,3 +5,9 @@
     stroke-width: 2;
     stroke-linecap: round;
 }
+
+/* Body parts hidden */
+.hidden {
+    opacity: 0;
+    transition: opacity 0.35s ease;
+}
