@@ -1,0 +1,7 @@
+/* For the gallows */
+#hangman-svg line,
+#hangman-svg circle {
+    stroke: currentColor;
+    stroke-width: 2;
+    stroke-linecap: round;
+}
