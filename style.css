@@ -1,4 +1,4 @@
-/* For the gallows */
+/* For the gallows, i don't this to move*/
 #hangman-svg line,
 #hangman-svg circle {
     stroke: currentColor;
@@ -10,4 +10,10 @@
 .hidden {
     opacity: 0;
     transition: opacity 0.35s ease;
+}
+
+/* JS removes .hidden and CSS animates the fade */
+#hangman-svg circle,
+#hangman-svg line[id] {
+    opacity: 1;
 }
